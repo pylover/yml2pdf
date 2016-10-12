@@ -2,10 +2,9 @@ import io
 
 # noinspection PyPackageRequirements
 import yaml
-
+from rtl import rtl
 from reportlab.pdfgen import canvas
-from reportlab.pdfbase.pdfmetrics import stringWidth
-
+from reportlab.pdfbase import pdfmetrics, ttfonts
 
 __version__ = '0.1.0-dev0'
 
@@ -25,10 +24,34 @@ class Template(canvas.Canvas):
         self.data = yaml.load(yml)
         self.outfile = out_file or io.BytesIO()
         self.current_page = 0
+
         canvas.Canvas.__init__(self, self.outfile, pagesize=(self.width, self.height))
 
     def measure_width(self, text):
-        return stringWidth(text, self._fontname, self._fontsize)
+        return pdfmetrics.stringWidth(text, self._fontname, self._fontsize)
+
+    @property
+    def fonts(self):
+        return self.data.get('fonts')
+
+    @property
+    def body(self):
+        return self.data.get('body')
+
+    @property
+    def font_name(self):
+        return self._fontname
+
+    @property
+    def default_font(self) -> str:
+        if not self.fonts:
+            return None
+
+        name = self.fonts.get('default')
+        if name:
+            return name
+
+        return next(self.fonts.keys())
 
     @property
     def width(self):
@@ -38,12 +61,20 @@ class Template(canvas.Canvas):
     def height(self):
         return self.data['height']
 
+    def register_fonts(self, context):
+        if self.fonts:
+
+            for font_name, font_filename in self.fonts.items():
+                if font_name == 'default':
+                    continue
+                pdfmetrics.registerFont(ttfonts.TTFont(font_name % context, font_filename % context))
+
     def draw_new_page(self, context):
         if self.current_page > 0:
             self.showPage()
         self.current_page += 1
 
-        for element in self.data['body']:
+        for element in self.body:
             element.draw(self, context)
 
 
@@ -65,16 +96,29 @@ class TextRenderModes(object):
 
 
 class Label(Element):
+    yaml_tag = '!Label'
 
-    yaml_tag = '!label'
     mode = TextRenderModes.fill_text
     text = None
     pos = (0, 0)
+    font = None
+    font_size = 10
+    rtl = None
 
-    # __slots__ = ('text', 'pos')
+    def ensure_font(self, tableau):
+        font_name = self.font or tableau.default_font
+
+        if tableau.font_name != font_name:
+            tableau.setFont(font_name, self.font_size)
 
     def draw(self, tableau, context):
-        tableau.drawString(self.pos[0], self.pos[1], self.text % context, mode=self.mode)
+        self.ensure_font(tableau)
+
+        text = self.text % context
+        if self.rtl:
+            text = rtl(text)
+
+        tableau.drawString(self.pos[0], self.pos[1], text, mode=self.mode)
 
 
 # def draw_center(self, y, text):

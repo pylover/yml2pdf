@@ -11,6 +11,7 @@ class TemplateTestCase(unittest.TestCase):
 
     def setUp(self):
         self.temp_dir = abspath(join(dirname(__file__), 'temp'))
+        self.stuff_dir = abspath(join(dirname(__file__), 'test_stuff'))
         if not exists(self.temp_dir):
             mkdir(self.temp_dir)
 
@@ -22,19 +23,25 @@ class TemplateTestCase(unittest.TestCase):
         width: 800
         height: 600
 
+        fonts:
+          default: tahoma
+          tahoma: '%(stuff)s/tahoma.ttf'
+          tahoma-bold: '%(stuff)s/tahoma-bold.ttf'
+
         body:
-          - !label
+          - !Label
             text: 'Page: %(page)s'
             pos: [20, 20]
 
 
-          - !label
+          - !Label
             text: 'Lorem Ipsum'
             pos: [20, 100]
 
-          - !label
+          - !Label
             text: 'لورم ایپسام'
             pos: [20, 200]
+            rtl: true
 
 
         """
@@ -42,17 +49,28 @@ class TemplateTestCase(unittest.TestCase):
         out = io.BytesIO()
         t = Template(yml, out)
 
+        ctx = dict(
+            stuff=self.stuff_dir,
+            temp=self.temp_dir,
+        )
+
+        t.register_fonts(ctx)
+
         self.assertEqual(t.data['width'], 800)
         self.assertEqual(t.data['height'], 600)
         self.assertIsInstance(t.data['body'][0], Label)
         self.assertEqual(t.data['body'][1].text, 'Lorem Ipsum')
 
         for i in range(5):
-            t.draw_new_page(dict(page=i+1))
+            ctx['page'] = i + 1
+            t.draw_new_page(ctx)
         t.save()
         out.seek(0)
 
         with open(out_filename, 'wb') as f:
             f.write(out.read())
-        self.assertEqual(len(out.getbuffer()) // 100, 37)
+        self.assertTrue(len(out.getbuffer()) // 100 >= 300)
 
+
+if __name__ == '__main__':
+    unittest.main()
