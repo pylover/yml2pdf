@@ -31,6 +31,10 @@ class Template(canvas.Canvas):
         return pdfmetrics.stringWidth(text, self._fontname, self._fontsize)
 
     @property
+    def version(self):
+        return self.data.get('version')
+
+    @property
     def fonts(self):
         return self.data.get('fonts')
 

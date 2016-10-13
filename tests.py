@@ -20,6 +20,7 @@ class TemplateTestCase(unittest.TestCase):
 
         yml = """
 
+        version: 1
         width: 800
         height: 600
 
