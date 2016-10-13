@@ -8,7 +8,8 @@ with open(os.path.join(os.path.dirname(__file__), 'yml2pdf.py')) as v_file:
 
 dependencies = [
     'PyYAML',
-    'reportlab'
+    'reportlab',
+    'rtl'
 ]
 
 
