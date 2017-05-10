@@ -1,6 +1,6 @@
 import os
 import re
-from setuptools import setup
+from setuptools import setup, find_packages
 
 # reading the package version without loading the package.
 with open(os.path.join(os.path.dirname(__file__), 'yml2pdf.py')) as v_file:
@@ -22,13 +22,11 @@ setup(
     version=package_version,
     author="Vahid Mardani",
     author_email="vahid.mardani@gmail.com",
-    # url="http://yml2pdf.dobisel.com",
     description="Generates PDF from YAML1 using ReportLab",
     maintainer="Vahid Mardani",
     maintainer_email="vahid.mardani@gmail.com",
-    py_modules=['yml2pdf'],
+    packages=find_packages(),
     platforms=["any"],
-    # long_description=read('README.rst'),
     install_requires=dependencies,
     classifiers=[
         'Programming Language :: Python :: 3.5',
