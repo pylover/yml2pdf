@@ -7,7 +7,7 @@ from reportlab.pdfbase import pdfmetrics, ttfonts
 
 
 # noinspection PyClassicStyleClass, PyAbstractClass
-class Template(canvas.Canvas):
+class Document:
     """
 
     Draw a YAML structure into ReportLab's canvas.
@@ -21,8 +21,6 @@ class Template(canvas.Canvas):
         self.data = yaml.load(yml)
         self.outfile = out_file or io.BytesIO()
         self.current_page = 0
-
-        canvas.Canvas.__init__(self, self.outfile, pagesize=(self.width, self.height))
 
     def measure_width(self, text):
         return pdfmetrics.stringWidth(text, self._fontname, self._fontsize)

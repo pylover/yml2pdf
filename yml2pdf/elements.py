@@ -3,12 +3,12 @@
 import yaml
 from rtl import rtl
 
-from yml2pdf.rendering import Template
+from yml2pdf.rendering import Document
 
 
 class Element(yaml.YAMLObject):
 
-    def draw(self, canvas: Template, context: dict):
+    def draw(self, canvas: Document, context: dict):
         raise NotImplementedError()
 
 

@@ -4,7 +4,7 @@ from os import mkdir
 import io
 import unittest
 
-from yml2pdf.rendering import Template
+from yml2pdf.rendering import Document
 from yml2pdf.elements import Label
 
 
@@ -31,7 +31,7 @@ class TemplateTestCase(unittest.TestCase):
           tahoma-bold: '%(stuff)s/tahoma-bold.ttf'
 
         body:
-          - !Label
+          - !Spacer (1, 2)
             text: 'Page: %(page)s'
             pos: [20, 20]
 
@@ -49,7 +49,7 @@ class TemplateTestCase(unittest.TestCase):
         """
 
         out = io.BytesIO()
-        t = Template(yml, out)
+        t = Document(yml, out)
 
         ctx = dict(
             stuff=self.stuff_dir,
