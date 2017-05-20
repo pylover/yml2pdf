@@ -2,11 +2,8 @@ import io
 
 # noinspection PyPackageRequirements
 import yaml
-from rtl import rtl
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics, ttfonts
-
-__version__ = '0.1.0-dev0'
 
 
 # noinspection PyClassicStyleClass, PyAbstractClass
@@ -80,61 +77,3 @@ class Template(canvas.Canvas):
 
         for element in self.body:
             element.draw(self, context)
-
-
-class Element(yaml.YAMLObject):
-
-    def draw(self, canvas: Template, context: dict):
-        raise NotImplementedError()
-
-
-class TextRenderModes(object):
-    fill_text = 0
-    stroke_text = 1
-    fill_then_stroke = 2
-    invisible = 3
-    fill_text_and_add_to_clipping_path = 4
-    stroke_text_and_add_to_clipping_path = 5
-    fill_then_stroke_and_add_to_clipping_path = 6
-    add_to_clipping_path = 7
-
-
-class Label(Element):
-    yaml_tag = '!Label'
-
-    mode = TextRenderModes.fill_text
-    text = None
-    pos = (0, 0)
-    font = None
-    font_size = 10
-    rtl = None
-
-    def ensure_font(self, tableau):
-        font_name = self.font or tableau.default_font
-
-        if tableau.font_name != font_name:
-            tableau.setFont(font_name, self.font_size)
-
-    def draw(self, tableau, context):
-        self.ensure_font(tableau)
-
-        text = self.text % context
-        if self.rtl:
-            text = rtl(text)
-
-        tableau.drawString(self.pos[0], self.pos[1], text, mode=self.mode)
-
-
-# def draw_center(self, y, text):
-#     self.drawCentredString(self.width / 2.0, y, text)
-#
-
-
-# from reportlab.graphics.barcode import code128
-# def draw_barcode(self, code, x, y, width, height):
-#     barcode = code128.Code128(
-#         code,
-#         quiet=0,
-#         barWidth=width,
-#         barHeight=height)
-#     barcode.drawOn(self, x, y)
