@@ -1,49 +1,49 @@
 
 # noinspection PyPackageRequirements
 import yaml
-from rtl import rtl
+from reportlab.lib.colors import HexColor
 
-from yml2pdf.rendering import Document
+from reportlab.platypus import Spacer
+from reportlab.platypus import Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
 
 
 class Element(yaml.YAMLObject):
 
-    def draw(self, canvas: Document, context: dict):
+    @property
+    def flowable(self):
         raise NotImplementedError()
 
+    def style_sheet(self, styles=None):
+        style_sheet = getSampleStyleSheet()['Normal']
 
-class TextRenderModes(object):
-    fill_text = 0
-    stroke_text = 1
-    fill_then_stroke = 2
-    invisible = 3
-    fill_text_and_add_to_clipping_path = 4
-    stroke_text_and_add_to_clipping_path = 5
-    fill_then_stroke_and_add_to_clipping_path = 6
-    add_to_clipping_path = 7
+        for key, value in styles.items():
+            if hasattr(style_sheet, key):
+                if key == 'textColor':
+                    setattr(style_sheet, key, HexColor(value))
+                else:
+                    setattr(style_sheet, key, value)
+
+        return style_sheet
 
 
-class Label(Element):
-    yaml_tag = '!Label'
+class ParagraphElement(Element):
+    yaml_tag = '!Paragraph'
 
-    mode = TextRenderModes.fill_text
     text = None
-    pos = (0, 0)
-    font = None
-    font_size = 10
-    rtl = None
+    styles = None
 
-    def ensure_font(self, tableau):
-        font_name = self.font or tableau.default_font
+    @property
+    def flowable(self):
+        return Paragraph(self.text, self.style_sheet(self.styles))
 
-        if tableau.font_name != font_name:
-            tableau.setFont(font_name, self.font_size)
 
-    def draw(self, tableau, context):
-        self.ensure_font(tableau)
+class SpacerElement(Element):
+    yaml_tag = "!Spacer"
 
-        text = self.text % context
-        if self.rtl:
-            text = rtl(text)
+    width = 0
+    height = 0
 
-        tableau.drawString(self.pos[0], self.pos[1], text, mode=self.mode)
+    @property
+    def flowable(self):
+        return Spacer(self.width, self.height)

@@ -2,9 +2,10 @@ import io
 
 # noinspection PyPackageRequirements
 import yaml
-from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics, ttfonts
+from reportlab.platypus import SimpleDocTemplate
 
+from yml2pdf.elements import Spacer, Element
 
 # noinspection PyClassicStyleClass, PyAbstractClass
 class Document:
@@ -17,17 +18,19 @@ class Document:
     """
 
     def __init__(self, yml, out_file=None):
-        # yaml.add_constructor('!label', Label)
         self.data = yaml.load(yml)
         self.outfile = out_file or io.BytesIO()
         self.current_page = 0
+        self.doc = SimpleDocTemplate(
+            self.outfile,
+            pagesize=[self.width, self.height],
+            rightMargin=20, leftMargin=20,
+            topMargin=20, bottomMargin=20
+        )
+        self.story = []
 
-    def measure_width(self, text):
-        return pdfmetrics.stringWidth(text, self._fontname, self._fontsize)
-
-    @property
-    def version(self):
-        return self.data.get('version')
+        for element in self.body:
+            self.story.append(element.flowable)
 
     @property
     def fonts(self):
@@ -68,10 +71,5 @@ class Document:
                     continue
                 pdfmetrics.registerFont(ttfonts.TTFont(font_name % context, font_filename % context))
 
-    def draw_new_page(self, context):
-        if self.current_page > 0:
-            self.showPage()
-        self.current_page += 1
-
-        for element in self.body:
-            element.draw(self, context)
+    def build(self):
+        self.doc.build(self.story)
