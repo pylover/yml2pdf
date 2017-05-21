@@ -1,12 +1,12 @@
-
 # noinspection PyPackageRequirements
 import yaml
-from reportlab.lib.colors import HexColor
 
+from reportlab.lib.colors import HexColor
 from reportlab.platypus import Spacer
 from reportlab.platypus import Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
 
+from yml2pdf.helpers import to_camel_case
 
 class Element(yaml.YAMLObject):
 
@@ -18,6 +18,7 @@ class Element(yaml.YAMLObject):
         style_sheet = getSampleStyleSheet()['Normal']
 
         for key, value in styles.items():
+            key = to_camel_case(key)
             if hasattr(style_sheet, key):
                 if key == 'textColor':
                     setattr(style_sheet, key, HexColor(value))

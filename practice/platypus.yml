@@ -9,7 +9,7 @@ body:
   - !Paragraph
     text: 'First paragraph'
     styles:
-      color: #FF0000
+      text_color: '#FF0000'
       font_size: 16
 
   - !Spacer
@@ -19,5 +19,30 @@ body:
   - !Paragraph
     text: 'Second paragraph'
     styles:
-      color: #00FF00
+      text_color: '#00FF00'
       font_size: 12
+
+  - !Table
+    data:
+      -
+        -
+          - !Paragraph
+            text: 'Header1'
+            styles:
+              text_color: '#FF0000'
+        -
+          - !Paragraph
+            text: 'Header2'
+            styles:
+              text_color: '#FF0000'
+          - !Paragraph
+            text: 'Header2 subtitle'
+            styles:
+              text_color: '#FF0000'
+      -
+        -
+          - !Paragraph
+            text: 'Value1'
+        -
+          - !Paragraph
+            text: 'Value2'

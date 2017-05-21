@@ -9,10 +9,13 @@ from yml2pdf.rendering import Document
 class TemplateTestCase(unittest.TestCase):
 
     def setUp(self):
+        self.temp_dir = abspath(join(dirname(__file__), 'temp'))
         self.stuff_dir = abspath(join(dirname(__file__), 'test_stuff'))
+        if not exists(self.temp_dir):
+            mkdir(self.temp_dir)
 
     def test_draw(self):
-        out_filename = join(dirname(__file__), 'test_draw.pdf')
+        out_filename = join(self.temp_dir, 'test_draw.pdf')
 
         yml = """
         width: 595
@@ -30,8 +33,8 @@ class TemplateTestCase(unittest.TestCase):
           - !Paragraph
             text: 'Hello word'
             styles:
-              textColor: '#FF0000'
-              fontSize: 12
+              text_color: '#FF0000'
+              font_size: 12
 
           - !Spacer
             height: 100
@@ -39,7 +42,7 @@ class TemplateTestCase(unittest.TestCase):
           - !Paragraph
             text: 'Hello word again'
             styles:
-              fontSize: 18
+              font_size: 18
               
           - !Spacer
             height: 10
@@ -47,8 +50,8 @@ class TemplateTestCase(unittest.TestCase):
           - !Paragraph
             text: 'Goodbye world'
             styles:
-              fontSize: 8
-              textColor: '#FF592F'
+              font_size: 8
+              text_color: '#00FF00'
 
         """
 
@@ -56,6 +59,7 @@ class TemplateTestCase(unittest.TestCase):
 
         ctx = dict(
             stuff=self.stuff_dir,
+            temp=self.temp_dir
         )
 
         doc.register_fonts(ctx)
