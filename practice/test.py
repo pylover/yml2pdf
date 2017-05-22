@@ -18,40 +18,46 @@ class TemplateTestCase(unittest.TestCase):
         out_filename = join(self.temp_dir, 'test_draw.pdf')
 
         yml = """
-        width: 595
-        height: 842
+width: 595
+height: 842
 
-        fonts:
-          default: tahoma
-          tahoma: '%(stuff)s/tahoma.ttf'
-          tahoma-bold: '%(stuff)s/tahoma-bold.ttf'
+fonts:
+  default: tahoma
+  tahoma: '%(stuff)s/tahoma.ttf'
+  tahoma-bold: '%(stuff)s/tahoma-bold.ttf'
 
-        body:
-          - !Spacer
-            height: 100
+body:
+  - !Spacer
+    height: 100
 
-          - !Paragraph
-            text: 'Hello word'
-            styles:
-              text_color: '#FF0000'
-              font_size: 12
+  - !Paragraph
+    text: 'Hello word'
+    styles:
+      text_color: '#FF0000'
+      font_size: 12
 
-          - !Spacer
-            height: 100
-            
-          - !Paragraph
-            text: 'Hello word again'
-            styles:
-              font_size: 18
-              
-          - !Spacer
-            height: 10
-                        
-          - !Paragraph
-            text: 'Goodbye world'
-            styles:
-              font_size: 8
-              text_color: '#00FF00'
+  - !Spacer
+    height: 100
+    
+  - !Paragraph
+    text: 'Hello word again'
+    styles:
+      font_size: 18
+      
+  - !Spacer
+    height: 10
+                
+  - !Paragraph
+    text: 'Goodbye world'
+    styles:
+      font_size: 8
+      text_color: '#00FF00'
+      
+  - !Table
+    header:
+      - !Column
+        - !Paragraph
+          text: 'header 1'
 
         """
 

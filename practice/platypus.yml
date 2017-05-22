@@ -23,26 +23,27 @@ body:
       font_size: 12
 
   - !Table
-    data:
-      -
-        -
+    header:
+      - !Column
+        - !Paragraph
+          text: 'header 1'
+      - !Column
+        - !Paragraph
+          text: 'header 2'
+
+    body:
+      - !Row
+        _ !Cell
+          - Paragraph
+            text: 'value 1'
+        _ !Cell
           - !Paragraph
-            text: 'Header1'
-            styles:
-              text_color: '#FF0000'
-        -
+            text: 'value 2'
+
+      - !Row
+        _ !Cell
+          - Paragraph
+            text: 'value 3'
+        _ !Cell
           - !Paragraph
-            text: 'Header2'
-            styles:
-              text_color: '#FF0000'
-          - !Paragraph
-            text: 'Header2 subtitle'
-            styles:
-              text_color: '#FF0000'
-      -
-        -
-          - !Paragraph
-            text: 'Value1'
-        -
-          - !Paragraph
-            text: 'Value2'
+            text: 'value 4'

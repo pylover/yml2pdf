@@ -48,3 +48,16 @@ class SpacerElement(Element):
     @property
     def flowable(self):
         return Spacer(self.width, self.height)
+
+
+class TableElement(Element):
+    yaml_tag = '!Table'
+
+    @property
+    def flowable(self):
+        # build table flowable
+        pass
+
+
+class ColumnElement(Element):
+    yaml_tag = '!Column'
