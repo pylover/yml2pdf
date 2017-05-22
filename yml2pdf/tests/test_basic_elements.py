@@ -5,14 +5,13 @@ import io
 import unittest
 
 from yml2pdf.documents import Document
-from yml2pdf.elements import ParagraphElement, SpacerElement
+from yml2pdf.elements import Paragraph, Spacer
 
 
 class TemplateTestCase(unittest.TestCase):
 
     def setUp(self):
         self.temp_dir = abspath(join(dirname(__file__), 'temp'))
-        self.stuff_dir = abspath(join(dirname(__file__), 'test_stuff'))
         if not exists(self.temp_dir):
             mkdir(self.temp_dir)
 
@@ -20,12 +19,7 @@ class TemplateTestCase(unittest.TestCase):
         out_filename = join(self.temp_dir, 'test_basic_elements.pdf')
 
         yml = """
-        
-        fonts:
-          default: tahoma
-          tahoma: '%(stuff)s/tahoma.ttf'
-          tahoma-bold: '%(stuff)s/tahoma-bold.ttf'
-        
+                
         document:
           width: 595
           height: 842  
@@ -35,11 +29,10 @@ class TemplateTestCase(unittest.TestCase):
             height: 50
 
           - !Paragraph
-            text: 'Lorem Ipsum'
+            text: 'This should be a red text with font 20'
             styles:
-              text_color: '#FF2222'
+              text_color: '#FF0000'
               font_size: 20
-
 
         """
 
@@ -47,17 +40,14 @@ class TemplateTestCase(unittest.TestCase):
         doc = Document(yml, out)
 
         ctx = dict(
-            stuff=self.stuff_dir,
             temp=self.temp_dir,
         )
 
-        doc.register_fonts(ctx)
-
-        self.assertEqual(doc.data['width'], 595)
-        self.assertEqual(doc.data['height'], 842)
-        self.assertIsInstance(doc.data['body'][0], SpacerElement)
-        self.assertIsInstance(doc.data['body'][1], ParagraphElement)
-        self.assertEqual(doc.data['body'][1].text, 'Lorem Ipsum')
+        self.assertEqual(doc.document_property['width'], 595)
+        self.assertEqual(doc.document_property['height'], 842)
+        self.assertIsInstance(doc.data['body'][0], Spacer)
+        self.assertIsInstance(doc.data['body'][1], Paragraph)
+        self.assertEqual(doc.data['body'][1].text, 'This should be a red text with font 20')
 
         doc.build()
         out.seek(0)

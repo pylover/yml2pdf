@@ -2,6 +2,7 @@
 import yaml
 
 from reportlab import platypus
+from reportlab.lib.styles import getSampleStyleSheet
 
 
 class Element(yaml.YAMLObject):
@@ -11,23 +12,29 @@ class Element(yaml.YAMLObject):
 class Flowable(Element):
     __flowable_class__ = None
     __flowable_attributes__ = None
-    __yaml_tag__ = None
 
     def to_flowable(self):
-        return self.__flowable_class__(**{k: v for k, v in self.__dict__.items() if k in self.__flowable_attributes__})
+        flowable_attributes = {}
+        for k, v in self.__flowable_attributes__.items():
+            if k in self.__dict__:
+                flowable_attributes[k] = self.__dict__[k]
+            else:
+                flowable_attributes[k] = v
+
+        return self.__flowable_class__(**flowable_attributes)
 
 
 class Stylable(Flowable):
-    __flowable_attributes__ = ['style']
+    __flowable_attributes__ = {'style': getSampleStyleSheet()['Normal']}
 
 
-class Paragraph(Stylable):
+class Paragraph(Flowable):
+    yaml_tag = '!Paragraph'
     __flowable_class__ = platypus.Paragraph
-    __flowable_attributes__ = Stylable.__flowable_attributes__ + ['text']
-    __yaml_tag__ = '!Paragraph'
+    __flowable_attributes__ = {'text': '', 'style': Stylable.__flowable_attributes__['style']}
 
 
-class Spacer(Element):
+class Spacer(Flowable):
+    yaml_tag = '!Spacer'
     __flowable_class__ = platypus.Spacer
-    __flowable_attributes__ = ['width', 'height']
-    __yaml_tag__ = '!Spacer'
+    __flowable_attributes__ = {'width': 0, 'height': 0}

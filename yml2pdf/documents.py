@@ -2,63 +2,49 @@ import io
 
 # noinspection PyPackageRequirements
 import yaml
-from reportlab.pdfbase import pdfmetrics, ttfonts
 from reportlab.platypus import SimpleDocTemplate
 
 
 class Document:
+    width = 595
+    height = 842
+    right_margin = 0
+    left_margin = 0
+    top_margin = 0
+    bottom_margin = 0
+
     def __init__(self, yml, out_file=None):
         self.data = yaml.load(yml)
         self.outfile = out_file or io.BytesIO()
         self.doc = SimpleDocTemplate(
             self.outfile,
-            pagesize=[self.width, self.height],
-            rightMargin=20, leftMargin=20,
-            topMargin=20, bottomMargin=20
+            pagesize=[self.document_property['width'], self.document_property['height']],
+            rightMargin=self.document_property['right_margin'],
+            leftMargin=self.document_property['left_margin'],
+            topMargin=self.document_property['top_margin'],
+            bottomMargin=self.document_property['bottom_margin']
         )
         self.story = []
 
         for element in self.body:
-            self.story.append(element.flowable)
-
-    @property
-    def fonts(self):
-        return self.data.get('fonts')
+            self.story.append(element.to_flowable())
 
     @property
     def body(self):
         return self.data.get('body')
 
     @property
-    def font_name(self):
-        return self._fontname
+    def document_property(self):
+        document_style = self.data['document']
 
-    @property
-    def default_font(self) -> str:
-        if not self.fonts:
-            return None
-
-        name = self.fonts.get('default')
-        if name:
-            return name
-
-        return next(self.fonts.keys())
-
-    @property
-    def width(self):
-        return self.data['width']
-
-    @property
-    def height(self):
-        return self.data['height']
-
-    def register_fonts(self, context):
-        if self.fonts:
-
-            for font_name, font_filename in self.fonts.items():
-                if font_name == 'default':
-                    continue
-                pdfmetrics.registerFont(ttfonts.TTFont(font_name % context, font_filename % context))
+        return dict(
+            width=document_style['width'] if 'width' in document_style else self.width,
+            height=document_style['height'] if 'height' in document_style else self.height,
+            right_margin=document_style['right_margin'] if 'right_margin' in document_style else self.right_margin,
+            left_margin=document_style['left_margin'] if 'left_margin' in document_style else self.left_margin,
+            bottom_margin=document_style['bottom_margin'] if 'bottom_margin' in document_style else self.bottom_margin,
+            top_margin=document_style['top_margin'] if 'top_margin' in document_style else self.top_margin
+        )
 
     def build(self):
         self.doc.build(self.story)
