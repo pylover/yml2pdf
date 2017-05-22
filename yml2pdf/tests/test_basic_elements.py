@@ -5,7 +5,7 @@ import io
 import unittest
 
 from yml2pdf.rendering import Document
-from yml2pdf.elements import Label
+from yml2pdf.elements import ParagraphElement, SpacerElement
 
 
 class TemplateTestCase(unittest.TestCase):
@@ -16,14 +16,13 @@ class TemplateTestCase(unittest.TestCase):
         if not exists(self.temp_dir):
             mkdir(self.temp_dir)
 
-    def test_draw(self):
-        out_filename = join(self.temp_dir, 'test_draw.pdf')
+    def test_basic_elements(self):
+        out_filename = join(self.temp_dir, 'test_basic_elements.pdf')
 
         yml = """
-
-        version: 1
-        width: 800
-        height: 600
+        
+        width: 595
+        height: 842
 
         fonts:
           default: tahoma
@@ -31,49 +30,42 @@ class TemplateTestCase(unittest.TestCase):
           tahoma-bold: '%(stuff)s/tahoma-bold.ttf'
 
         body:
-          - !Spacer (1, 2)
-            text: 'Page: %(page)s'
-            pos: [20, 20]
+          - !Spacer
+            height: 50
 
-
-          - !Label
+          - !Paragraph
             text: 'Lorem Ipsum'
-            pos: [20, 100]
-
-          - !Label
-            text: 'لورم ایپسام'
-            pos: [20, 200]
-            rtl: true
+            styles:
+              text_color: '#FF2222'
+              font_size: 20
 
 
         """
 
         out = io.BytesIO()
-        t = Document(yml, out)
+        doc = Document(yml, out)
 
         ctx = dict(
             stuff=self.stuff_dir,
             temp=self.temp_dir,
         )
 
-        t.register_fonts(ctx)
+        doc.register_fonts(ctx)
 
-        self.assertEqual(t.data['width'], 800)
-        self.assertEqual(t.data['height'], 600)
-        self.assertIsInstance(t.data['body'][0], Label)
-        self.assertEqual(t.data['body'][1].text, 'Lorem Ipsum')
+        self.assertEqual(doc.data['width'], 595)
+        self.assertEqual(doc.data['height'], 842)
+        self.assertIsInstance(doc.data['body'][0], SpacerElement)
+        self.assertIsInstance(doc.data['body'][1], ParagraphElement)
+        self.assertEqual(doc.data['body'][1].text, 'Lorem Ipsum')
 
-        for i in range(5):
-            ctx['page'] = i + 1
-            t.draw_new_page(ctx)
-        t.save()
+        doc.build()
         out.seek(0)
 
         with open(out_filename, 'wb') as f:
             f.write(out.read())
 
         file_length = len(out.getbuffer())
-        self.assertTrue(file_length // 100 >= 290)
+        self.assertTrue(file_length // 100 >= 15)
 
 
 if __name__ == '__main__':
