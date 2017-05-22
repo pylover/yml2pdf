@@ -4,7 +4,7 @@ from os import mkdir
 import io
 import unittest
 
-from yml2pdf.rendering import Document
+from yml2pdf.documents import Document
 from yml2pdf.elements import ParagraphElement, SpacerElement
 
 
@@ -21,13 +21,14 @@ class TemplateTestCase(unittest.TestCase):
 
         yml = """
         
-        width: 595
-        height: 842
-
         fonts:
           default: tahoma
           tahoma: '%(stuff)s/tahoma.ttf'
           tahoma-bold: '%(stuff)s/tahoma-bold.ttf'
+        
+        document:
+          width: 595
+          height: 842  
 
         body:
           - !Spacer

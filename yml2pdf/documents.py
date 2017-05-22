@@ -5,22 +5,11 @@ import yaml
 from reportlab.pdfbase import pdfmetrics, ttfonts
 from reportlab.platypus import SimpleDocTemplate
 
-from yml2pdf.elements import Spacer, Element
 
-# noinspection PyClassicStyleClass, PyAbstractClass
 class Document:
-    """
-
-    Draw a YAML structure into ReportLab's canvas.
-
-    :param yml: ``str`` or ``file-like`` object.
-    :param out_file: ``str`` or ``file-like`` object.
-    """
-
     def __init__(self, yml, out_file=None):
         self.data = yaml.load(yml)
         self.outfile = out_file or io.BytesIO()
-        self.current_page = 0
         self.doc = SimpleDocTemplate(
             self.outfile,
             pagesize=[self.width, self.height],

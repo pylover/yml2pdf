@@ -3,7 +3,7 @@ from os.path import dirname, abspath, join, exists
 from os import mkdir
 import unittest
 
-from yml2pdf.rendering import Document
+from yml2pdf.documents import Document
 
 
 class TemplateTestCase(unittest.TestCase):

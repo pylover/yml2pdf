@@ -1,63 +1,33 @@
 # noinspection PyPackageRequirements
 import yaml
 
-from reportlab.lib.colors import HexColor
-from reportlab.platypus import Spacer
-from reportlab.platypus import Paragraph
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab import platypus
 
-from yml2pdf.helpers import to_camel_case
 
 class Element(yaml.YAMLObject):
-
-    @property
-    def flowable(self):
-        raise NotImplementedError()
-
-    def style_sheet(self, styles=None):
-        style_sheet = getSampleStyleSheet()['Normal']
-
-        for key, value in styles.items():
-            key = to_camel_case(key)
-            if hasattr(style_sheet, key):
-                if key == 'textColor':
-                    setattr(style_sheet, key, HexColor(value))
-                else:
-                    setattr(style_sheet, key, value)
-
-        return style_sheet
+    pass
 
 
-class ParagraphElement(Element):
-    yaml_tag = '!Paragraph'
+class Flowable(Element):
+    __flowable_class__ = None
+    __flowable_attributes__ = None
+    __yaml_tag__ = None
 
-    text = None
-    styles = None
-
-    @property
-    def flowable(self):
-        return Paragraph(self.text, self.style_sheet(self.styles))
+    def to_flowable(self):
+        return self.__flowable_class__(**{k: v for k, v in self.__dict__.items() if k in self.__flowable_attributes__})
 
 
-class SpacerElement(Element):
-    yaml_tag = "!Spacer"
-
-    width = 0
-    height = 0
-
-    @property
-    def flowable(self):
-        return Spacer(self.width, self.height)
+class Stylable(Flowable):
+    __flowable_attributes__ = ['style']
 
 
-class TableElement(Element):
-    yaml_tag = '!Table'
-
-    @property
-    def flowable(self):
-        # build table flowable
-        pass
+class Paragraph(Stylable):
+    __flowable_class__ = platypus.Paragraph
+    __flowable_attributes__ = Stylable.__flowable_attributes__ + ['text']
+    __yaml_tag__ = '!Paragraph'
 
 
-class ColumnElement(Element):
-    yaml_tag = '!Column'
+class Spacer(Element):
+    __flowable_class__ = platypus.Spacer
+    __flowable_attributes__ = ['width', 'height']
+    __yaml_tag__ = '!Spacer'
