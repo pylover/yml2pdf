@@ -6,12 +6,13 @@ from reportlab.platypus import SimpleDocTemplate
 
 
 class Document:
-    width = 595
-    height = 842
-    right_margin = 0
-    left_margin = 0
-    top_margin = 0
-    bottom_margin = 0
+    # Default values
+    width = 595  # A4 width
+    height = 842  # A4 height
+    right_margin = 10
+    left_margin = 10
+    top_margin = 10
+    bottom_margin = 10
 
     def __init__(self, yml, out_file=None):
         self.data = yaml.load(yml)
