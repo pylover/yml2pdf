@@ -43,8 +43,8 @@ class TemplateTestCase(unittest.TestCase):
             temp=self.temp_dir,
         )
 
-        self.assertEqual(doc.document_property['width'], 595)
-        self.assertEqual(doc.document_property['height'], 842)
+        self.assertEqual(doc.data['document']['width'], 595)
+        self.assertEqual(doc.data['document']['height'], 842)
         self.assertIsInstance(doc.data['body'][0], Spacer)
         self.assertIsInstance(doc.data['body'][1], Paragraph)
         self.assertEqual(doc.data['body'][1].text, 'This should be a red text with font 20')

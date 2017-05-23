@@ -22,17 +22,25 @@ class Flowable(Element):
         result = self.__class__.styles.copy()
         if self.styles is not self.__class__.styles:
             result.update(self.styles)
-        return self.__flowable_style_class__(**result)
+        return self.__flowable_style_class__(name='%s_styles' % self.__class__.__name__, **result)
 
-    def __getattr__(self, item):
-        if item == 'styles':
-            return self.create_style()
-        return object.__getattribute__(self, item)
+    # noinspection PyMethodMayBeStatic
+    def translate_flowable_params(self):
+        params = {
+            k: getattr(self, k, v) for k, v in self.__flowable_attributes__.items()
+        }
+
+        def style_factory(k, v):
+            return 'style', self.create_style()
+
+        factories = {
+            'styles': style_factory
+        }
+
+        return dict([factories[k](k, v) if k in factories else (to_camel_case(k), v) for k, v in params.items()])
 
     def to_flowable(self):
-        return self.__flowable_class__(**{
-            to_camel_case(k): getattr(self, k, v) for k, v in self.__flowable_attributes__.items()
-        })
+        return self.__flowable_class__(**self.translate_flowable_params())
 
 
 class Paragraph(Flowable):
@@ -45,8 +53,10 @@ class Paragraph(Flowable):
     __flowable_style_class__ = styles.ParagraphStyle
 
     styles = dict(
-
+        fontSize=10,
+        leading=12
     )
+
 
 class Spacer(Flowable):
     yaml_tag = '!Spacer'
