@@ -30,7 +30,7 @@ class TemplateTestCase(unittest.TestCase):
 
           - !Paragraph
             text: 'This should be a red text with font 20'
-            styles:
+            !ParagraphStyle
               text_color: '#FF0000'
               font_size: 20
 
