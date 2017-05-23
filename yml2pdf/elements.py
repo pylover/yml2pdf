@@ -20,9 +20,13 @@ class Flowable(Element):
 
     def create_style(self):
         result = self.__class__.styles.copy()
-        if self.styles is not self.__class__.styles:
-            result.update(self.styles)
-        return self.__flowable_style_class__(name='%s_styles' % self.__class__.__name__, **result)
+        self_styles = {to_camel_case(k): v for k, v in self.styles.items()}
+        if self_styles is not self.__class__.styles:
+            result.update(self_styles)
+        return self.__flowable_style_class__(
+            name='%s_styles' % self.__class__.__name__,
+            **{to_camel_case(k): v for k, v in result.items()}
+        )
 
     # noinspection PyMethodMayBeStatic
     def translate_flowable_params(self):

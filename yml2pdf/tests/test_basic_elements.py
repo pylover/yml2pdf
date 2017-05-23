@@ -22,17 +22,30 @@ class TemplateTestCase(unittest.TestCase):
                 
         document:
           width: 595
-          height: 842  
+          height: 842 
+          left_margin: 100
 
         body:
           - !Spacer
             height: 50
+            
+          - !Paragraph
+            text: 'This should be a green text with font size 15. Top margin is 50.'
+            styles:
+              text_color: '#00FF00'
+              font_size: 15
 
           - !Paragraph
-            text: 'This should be a red text with font 20'
+            text: 'This should be a red text with font size 20'
             styles:
-              text_color: '#FF0000'
+              text_color: 'red'
               font_size: 20
+          
+          - !Spacer
+            height: 50
+          
+          - !Paragraph
+            text: 'Default style for paragraph. Document has 100 left margin.'
 
         """
 
@@ -47,7 +60,9 @@ class TemplateTestCase(unittest.TestCase):
         self.assertEqual(doc.data['document']['height'], 842)
         self.assertIsInstance(doc.data['body'][0], Spacer)
         self.assertIsInstance(doc.data['body'][1], Paragraph)
-        self.assertEqual(doc.data['body'][1].text, 'This should be a red text with font 20')
+        self.assertIsInstance(doc.data['body'][2], Paragraph)
+        self.assertEqual(doc.data['body'][1].text, 'This should be a green text with font size 15. Top margin is 50.')
+        self.assertEqual(doc.data['body'][2].text, 'This should be a red text with font size 20')
 
         doc.build()
         out.seek(0)
