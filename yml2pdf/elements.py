@@ -40,13 +40,13 @@ class Flowable(Element):
         result.append(header_row)
 
         for r in self.body:
-            body_row = []
+            body_rows = []
             for c in r:
                 flowable_cells = []
                 for p in c:
                     flowable_cells.append(p.to_flowable())
-                body_row.append(flowable_cells)
-            result.append(body_row)
+                body_rows.append(flowable_cells)
+            result.append(body_rows)
 
         return result
 
@@ -103,6 +103,8 @@ class Table(Flowable):
     __flowable_attributes__ = {
         'data': [['No Data For Table']]
     }
+    header = []
+    body = [[]]
 
 
 def custom_sequence_constructor(loader, node):
@@ -111,4 +113,3 @@ def custom_sequence_constructor(loader, node):
 yaml.add_constructor('!Column', custom_sequence_constructor)
 yaml.add_constructor('!Row', custom_sequence_constructor)
 yaml.add_constructor('!Cell', custom_sequence_constructor)
-
