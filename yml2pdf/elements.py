@@ -28,6 +28,28 @@ class Flowable(Element):
             **{to_camel_case(k): v for k, v in result.items()}
         )
 
+    def create_data(self):
+        result = []
+
+        header_row = []
+        for c in self.header:
+            flowable_columns = []
+            for p in c:
+                flowable_columns.append(p.to_flowable())
+            header_row.append(flowable_columns)
+        result.append(header_row)
+
+        for r in self.body:
+            body_row = []
+            for c in r:
+                flowable_cells = []
+                for p in c:
+                    flowable_cells.append(p.to_flowable())
+                body_row.append(flowable_cells)
+            result.append(body_row)
+
+        return result
+
     # noinspection PyMethodMayBeStatic
     def translate_flowable_params(self):
         params = {
@@ -37,8 +59,12 @@ class Flowable(Element):
         def style_factory(k, v):
             return 'style', self.create_style()
 
+        def data_factory(k, v):
+            return 'data', self.create_data()
+
         factories = {
-            'styles': style_factory
+            'styles': style_factory,
+            'data': data_factory
         }
 
         return dict([factories[k](k, v) if k in factories else (to_camel_case(k), v) for k, v in params.items()])
@@ -69,3 +95,20 @@ class Spacer(Flowable):
         'width': 0,
         'height': 0
     }
+
+
+class Table(Flowable):
+    yaml_tag = '!Table'
+    __flowable_class__ = platypus.Table
+    __flowable_attributes__ = {
+        'data': [['No Data For Table']]
+    }
+
+
+def custom_sequence_constructor(loader, node):
+    return loader.construct_sequence(node)
+
+yaml.add_constructor('!Column', custom_sequence_constructor)
+yaml.add_constructor('!Row', custom_sequence_constructor)
+yaml.add_constructor('!Cell', custom_sequence_constructor)
+
