@@ -4,7 +4,7 @@ import io
 import unittest
 
 from yml2pdf.documents import Document
-from yml2pdf.elements import Paragraph, Spacer
+from yml2pdf.elements import Paragraph, Spacer, Table
 
 
 class TemplateTestCase(unittest.TestCase):
@@ -25,12 +25,6 @@ class TemplateTestCase(unittest.TestCase):
         body:
           - !Spacer
             height: 50
-
-          - !Paragraph
-            text: 'This should be a green text with font size 15. Top margin is 50.'
-            styles:
-              text_color: '#00FF00'
-              font_size: 15
               
           - !Table
             header:
@@ -66,6 +60,13 @@ class TemplateTestCase(unittest.TestCase):
         ctx = dict(
             temp=self.temp_dir,
         )
+
+        self.assertEqual(doc.data['document']['width'], 595)
+        self.assertEqual(doc.data['document']['height'], 842)
+        self.assertIsInstance(doc.data['body'][0], Spacer)
+        self.assertIsInstance(doc.data['body'][1], Table)
+        self.assertIsInstance(doc.data['body'][1].header[0][0], Paragraph)
+        self.assertEqual(doc.data['body'][1].header[0][0].text, 'header1')
 
         doc.build()
         out.seek(0)

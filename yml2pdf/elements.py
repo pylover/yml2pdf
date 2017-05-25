@@ -32,18 +32,18 @@ class Flowable(Element):
         result = []
 
         header_row = []
-        for c in self.header:
+        for column in self.header:
             flowable_columns = []
-            for p in c:
+            for p in column:
                 flowable_columns.append(p.to_flowable())
             header_row.append(flowable_columns)
         result.append(header_row)
 
-        for r in self.body:
+        for row in self.body:
             body_rows = []
-            for c in r:
+            for cell in row:
                 flowable_cells = []
-                for p in c:
+                for p in cell:
                     flowable_cells.append(p.to_flowable())
                 body_rows.append(flowable_cells)
             result.append(body_rows)
