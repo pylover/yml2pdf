@@ -78,7 +78,7 @@ class Paragraph(Flowable):
     __flowable_class__ = platypus.Paragraph
     __flowable_attributes__ = {
         'text': '',
-        'styles': styles.getSampleStyleSheet()['Normal']
+        'styles': None
     }
     __flowable_style_class__ = styles.ParagraphStyle
 
@@ -101,7 +101,7 @@ class Table(Flowable):
     yaml_tag = '!Table'
     __flowable_class__ = platypus.Table
     __flowable_attributes__ = {
-        'data': [['No Data For Table']]
+        'data': None
     }
     header = []
     body = [[]]

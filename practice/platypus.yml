@@ -23,6 +23,10 @@ body:
       font_size: 12
 
   - !Table
+    class:
+      - simple_table_style
+      - bold_header
+
     header:
       - !Column
         - !Paragraph
