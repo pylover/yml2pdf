@@ -3,6 +3,7 @@ import yaml
 
 from reportlab import platypus
 from reportlab.lib import styles
+from reportlab.platypus.tables import TableStyle
 
 from yml2pdf.helpers import to_camel_case
 
@@ -28,46 +29,19 @@ class Flowable(Element):
             **{to_camel_case(k): v for k, v in result.items()}
         )
 
-    def create_data(self):
-        result = []
-
-        header_row = []
-        for column in self.header:
-            flowable_columns = []
-            for p in column:
-                flowable_columns.append(p.to_flowable())
-            header_row.append(flowable_columns)
-        result.append(header_row)
-
-        for row in self.body:
-            body_rows = []
-            for cell in row:
-                flowable_cells = []
-                for p in cell:
-                    flowable_cells.append(p.to_flowable())
-                body_rows.append(flowable_cells)
-            result.append(body_rows)
-
-        return result
-
     # noinspection PyMethodMayBeStatic
     def translate_flowable_params(self):
+        result = {}
         params = {
             k: getattr(self, k, v) for k, v in self.__flowable_attributes__.items()
         }
 
-        def style_factory(k, v):
-            return 'style', self.create_style()
+        if 'styles' in params:
+            result['style'] = self.create_style()
+            del params['styles']
 
-        def data_factory(k, v):
-            return 'data', self.create_data()
-
-        factories = {
-            'styles': style_factory,
-            'data': data_factory
-        }
-
-        return dict([factories[k](k, v) if k in factories else (to_camel_case(k), v) for k, v in params.items()])
+        result.update({to_camel_case(k): v for k, v in params.items()})
+        return result
 
     def to_flowable(self):
         return self.__flowable_class__(**self.translate_flowable_params())
@@ -101,10 +75,13 @@ class Table(Flowable):
     yaml_tag = '!Table'
     __flowable_class__ = platypus.Table
     __flowable_attributes__ = {
-        'data': None
+        'data': None,
+        'style': None
     }
-    header = []
-    body = [[]]
+    __flowable_style_class__ = TableStyle
+
+    header = None
+    body = None
 
 
 def custom_sequence_constructor(loader, node):

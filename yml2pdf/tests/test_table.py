@@ -14,7 +14,7 @@ class TemplateTestCase(unittest.TestCase):
             mkdir(self.temp_dir)
 
     def test_basic_elements(self):
-        out_filename = join(self.temp_dir, 'test_basic_elements.pdf')
+        out_filename = join(self.temp_dir, 'test_table.pdf')
 
         yml = """
 
@@ -56,10 +56,6 @@ class TemplateTestCase(unittest.TestCase):
 
         out = io.BytesIO()
         doc = Document(yml, out)
-
-        ctx = dict(
-            temp=self.temp_dir,
-        )
 
         self.assertEqual(doc.data['document']['width'], 595)
         self.assertEqual(doc.data['document']['height'], 842)
